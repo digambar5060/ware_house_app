@@ -1,0 +1,28 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="messages">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+
+        <script>
+            $(document).ready(function() {
+                // Fade out the flash messages after 3 seconds
+                $('.messages').delay(3000).fadeOut('slow');
+            });
+        </script>
+    {% endif %}
+{% endwith %}
+
+<!-- Rest of your welcome page content -->
+
+<!-- Rest of your welcome page content -->
+
+
+{% extends "base_login.html" %}
+{% block content %}
+<div class="jumbotron">
+  <p>Congrats! You are logged in!</p>
+</div>
+{% endblock %}

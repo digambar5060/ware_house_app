@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+{% block previous %}
+<li class="nav-link"><a href="{{url_for('Flowchart')}}">Previous Page</a></li>
+{% endblock %}
+
+{% block next %}
+<li class="nav-link"><a href="{{url_for('labex')}}">Next Page</a></li>
+<li class="nav-link"><a href="{{url_for('options')}}">Go To Options</a></li>
+{% endblock %}
+
+
+{% block title %} Home {% endblock %}
+
+
+
+{% block body %}
+
+<style xmlns="http://www.w3.org/1999/html">
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+label {
+  display: inline-block;
+  width: 130px;
+  font-weight:bold;
+}
+</style>
+
+
+<div class="jumbotron">
+    <h2>Capex <b>Calculations </b>
+        <button type="button"  class="btn btn-success float-right"
+                data-toggle="modal" data-target="#mymodal">Add New Data</button>
+    </h2>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+
+    <div class="alert alert-success alert-dismissable" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">x</span>
+        </button>
+
+        {{message}}
+    </div>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <br>
+
+    <table class="table table-success table-striped">
+
+        <tr>
+            <th>Description</th>
+            {% for i in range(years) %}
+            <th>Year {{i+1}}</th>
+            {% endfor %}
+        </tr>
+
+        {% for num_element in range(grand_list_rows) %}
+        <tr>
+            <th>{{grand_total_list[num_element]}}</th>
+            {% for i in range(years) %}
+            <td>{{data_list[5*i+num_element]}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <table class="table table-success table-striped">
+<!--Display capex storage data-->
+
+        <!-- Display capex table heading-->
+        <tr>
+            {% for dlbl, lbl in output_list %}
+                {% if lbl in ['Quantity','Total Investment','Monthly Emi','Monthly Depreciation','Monthly Interest', 'Monthly Maintenance Cost'] %}
+                        {% for i in range(years) %}
+                        <th bgcolor="#79e095">{{lbl}} Year {{i+1}}</th>
+                        {% endfor %}
+                {% else %}
+                <th bgcolor="#79e095">{{lbl}}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+
+        <!--Display capex 'storage' data-->
+        {% for nct in range(ncts) %}
+
+        <tr>
+            {% for dlbl, lbl in output_list %}
+            {% if lbl in ['Quantity','Total Investment','Monthly Emi','Monthly Depreciation','Monthly Interest', 'Monthly Maintenance Cost'] %}
+            {% for i in range(years) %}
+            <td>{{capex_data_storage[years*nct+i][dlbl]}}</td>
+            {% endfor %}
+            {% else %}
+            <td>{{capex_data_storage[years*nct+0][dlbl]}}</td>
+            {% endif %}
+            {% endfor%}
+            <td>
+                <span>
+                    <a class="btn btn-success" data-toggle="modal" data-target="#modaledit{{nct}}" >Update</a>
+                </span>
+            </td>
+        </tr>
+
+
+
+        <!--Edit Capex 'storage' data-->
+        <div id="modaledit{{nct}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update Capex Data</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form action="{{url_for('update_capex')}}" method="POST">
+                            <div class="form-group">
+                                <input type=hidden  name=id value={{nct}}>
+                                {% for dlbl, lbl in input_list %}
+                                {% if dlbl in ['category', 'items' ] %}
+                                <label>{{lbl}}:</label>
+                                {{ capex_data_storage[years*nct+0][dlbl] }}
+                                {% elif dlbl == 'quantity' %}
+                                {% for i in range(years) %}
+                                <label>{{lbl}}  Year {{i+1}}:</label>
+                                {{ capex_data_storage[years*nct+i][dlbl] }}
+                                <br>
+                                {% endfor %}
+                                {% elif dlbl in ['investment_inclusion'] %}
+                                <label>{{lbl}}:</label>
+                                <select name={{dlbl}} required>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                                {% elif dlbl in ['items', 'uom'] %}
+                                <label>{{lbl}}:</label>
+                                <input type=text  name={{dlbl}} value={{capex_data_storage[years*nct+0][dlbl]}} required="1" >
+                                {% else %}
+                                <label>{{lbl}}:</label>
+                                <input type=number  step=any name={{dlbl}} value={{dlbl}} required="1" >
+                                {% endif %}
+                                <br>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit">Update</button>
+                            </div>
+                         </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!--    Display Capex Miscellaneous Data-->
+        {% for misc_row in range(misc_rows) %}
+
+        <tr>
+            {% for dlbl, lbl in output_list %}
+            {% if lbl in ['Quantity','Total Investment','Monthly Emi','Monthly Depreciation','Monthly Interest', 'Monthly Maintenance Cost'] %}
+            {% for i in range(years) %}
+            <td>{{capex_data_misc[years*misc_row+i][dlbl]}}</td>
+            {% endfor %}
+            {% else %}
+            <td>{{capex_data_misc[years*misc_row+0][dlbl]}}</td>
+            {% endif %}
+            {% endfor%}
+            <td>
+                <span>
+                    <a class="btn btn-success" data-toggle="modal" data-target="#modal_misc_edit{{misc_row}}" >Update</a>
+                </span>
+            </td>
+        </tr>
+
+        <!--Edit Capex Miscellaneous Data-->
+        <div id="modal_misc_edit{{misc_row}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update Capex Data</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form action="{{url_for('update_capex_misc')}}" method="POST">
+                            <div class="form-group">
+                                <input type=hidden  name=id value={{misc_row}}>
+                                {% for dlbl, lbl in input_list %}
+                                {% if dlbl in ['category', 'items' ] %}
+                                <label>{{lbl}}:</label>
+                                {{ capex_data_misc[years*misc_row+0][dlbl] }}
+                                {% elif dlbl == 'quantity' %}
+                                {% for i in range(years) %}
+                                <label>{{lbl}} - Year {{i+1}}</label>
+                                <input type=number  step=1 name={{dlbl}}{{i}} required="1" >
+                                <br>
+                                {% endfor %}
+                                {% elif dlbl in ['investment_inclusion'] %}
+                                <label>{{lbl}}:</label>
+                                <select name={{dlbl}} required>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                                {% elif dlbl in ['uom'] %}
+                                <label>{{lbl}}:</label>
+                                <input type=text  name={{dlbl}} value={{capex_data_misc[years*misc_row+0][dlbl]}} required="1" >
+                                {% else %}
+                                <label>{{lbl}}:</label>
+                                <input type=number  step=any name={{dlbl}} value={{dlbl}} required="1" >
+                                {% endif %}
+                                <br>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit">Update</button>
+                            </div>
+                         </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </table>
+
+</div>
+
+
+
+<!-- Modal Add Capex type-->
+
+<div id="mymodal" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+
+         <div class="modal-header">
+            <h4 class="modal-title">Add New Data</h4>
+         </div>
+
+         <div class="modal-body ">
+            <form action="{{url_for('capexinputtrial')}}" method="POST">
+                 <div  class="form-group">
+                     <br>
+                     {% for dlbl, label in input_list %}
+                     {% if dlbl in ['quantity'] %}
+                     {% for i in range(years) %}
+                     <label>{{label}} - Year {{i+1}}</label>
+                     <input type=number  step=1 name={{dlbl}}{{i}} required="1" >
+                     <br>
+                     {% endfor %}
+                     {% elif dlbl in ['category', 'items', 'uom'] %}
+                     <label>{{label}}</label>
+                     <input type=text  name={{dlbl}} required="1" >
+                     {% elif dlbl in ['investment_inclusion'] %}
+                     <label>{{label}}</label>
+                     <select name={{dlbl}} required>
+                         <option value="yes">Yes</option>
+                         <option value="no">No</option>
+                     </select>
+                     {% else %}
+                     <label>{{label}}</label>
+                     <input type=number  step=any name={{dlbl}} required="1" >
+                     {% endif %}
+                     <br>
+                     {% endfor %}
+                 </div>
+
+                <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Add Data</button>
+                </div>
+            </form>
+         </div>
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+{% endblock %}

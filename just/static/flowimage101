@@ -1,0 +1,5 @@
+digraph {
+	n_5dc9a19e7a2b4a90a91fea1020c8c88f [label="Unload inbound cartons" fillcolor=lightblue shape=oval style=filled]
+	n_aac4d8bb33ae442797eac58eba2f1ac8 [label="A Complete" fillcolor=lightblue fontname=courier shape=ellipse style=filled]
+	n_5dc9a19e7a2b4a90a91fea1020c8c88f -> n_aac4d8bb33ae442797eac58eba2f1ac8
+}

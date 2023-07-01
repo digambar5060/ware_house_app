@@ -1,0 +1,42 @@
+<!-- {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="messages">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+
+        <script>
+            $(document).ready(function() {
+                // Fade out the flash messages after 3 seconds
+                $('.messages').delay(3000).fadeOut('slow');
+            });
+        </script>
+    {% endif %}
+{% endwith %} -->
+
+{% extends "base_login.html" %}
+{% block content %}
+<div class="jumbotron">
+<form method="POST">
+
+    {# This hidden_tag is a CSRF security feature. #}
+    {{ form.hidden_tag() }}
+    <table  class="table table-striped">
+      <tr>
+        <td>{{ form.email.label }} </td>
+        <td>  {{ form.email() }} </td>
+
+      </tr>
+      <td>{{ form.password.label }} </td>
+      <td>  {{ form.password() }} </td>
+
+    </table>
+
+    {{ form.submit() }}
+
+  </form>
+  </div>
+
+
+{% endblock %}

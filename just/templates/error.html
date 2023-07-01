@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block next %}
+<li class="nav-link"><a href="{{ url_for('options') }}">Go To Options</a></li>
+{% endblock %}
+
+{% block body %}
+<style>
+  .error-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  .error-content {
+    text-align: center;
+  }
+</style>
+
+<div class="error-container">
+  <div class="error-content">
+    <h1>Error</h1>
+    <p>{{ message }}</p>
+  </div>
+</div>
+{% endblock %}

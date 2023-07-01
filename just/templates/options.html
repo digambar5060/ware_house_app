@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+
+{% block title %} Home {% endblock %}
+
+
+
+{% block body %}
+
+
+
+<div class="container1" >
+  <div class="list-group">
+    <a href="{{url_for('project_details')}}" class="list-group-item list-group-item-action">Project Details</a>
+    <a href="{{url_for('financialparameters')}}" class="list-group-item list-group-item-action list-group-item-primary">Financial Parameter</a>
+    <a href="{{url_for('CustomerData')}}" class="list-group-item list-group-item-action list-group-item-secondary">Customer Data & Assumptions</a>
+    <a href="{{url_for('general_assumptions')}}" class="list-group-item list-group-item-action list-group-item-success">General Assumptions</a>
+    <a href="{{url_for('operational_assumptions')}}" class="list-group-item list-group-item-action list-group-item-danger">Operational Assumptions</a>
+    <a href="{{url_for('storage')}}" class="list-group-item list-group-item-action list-group-item-warning">Space Modelling</a>
+    <a href="{{url_for('DataEntry')}}" class="list-group-item list-group-item-action list-group-item-info">Process Details & Manpower Calc.</a>
+    <a href="{{url_for('Flowchart')}}" class="list-group-item list-group-item-action list-group-item-light">Process Flow</a>
+    <a href="{{url_for('capexinputtrial')}}" class="list-group-item list-group-item-action list-group-item-dark">Capex Investment</a>
+    <a href="{{url_for('labex')}}" class="list-group-item list-group-item-action list-group-item-primary">Labex</a>
+    <a href="{{url_for('opex')}}" class="list-group-item list-group-item-action list-group-item-secondary">Opex</a>
+    <a href="{{url_for('project_implementation_cost')}}" class="list-group-item list-group-item-action list-group-item-success">Project Implementation Cost</a>
+    <a href="{{url_for('one_time_cost')}}" class="list-group-item list-group-item-action list-group-item-danger">One Time Cost</a>
+    <a href="{{url_for('commercial')}}" class="list-group-item list-group-item-action list-group-item-warning">Commercial</a>
+    <a href="#" class="list-group-item list-group-item-action list-group-item-info">Project Layout</a>
+    <a href="#" class="list-group-item list-group-item-action list-group-item-light">Solution Deck</a>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}

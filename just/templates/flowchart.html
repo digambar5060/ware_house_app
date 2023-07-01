@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+{% block previous %}
+<li class="nav-link"><a href="{{url_for('DataEntry')}}">Previous Page</a></li>
+{% endblock %}
+
+{% block next %}
+<li class="nav-link"><a href="{{url_for('capexinputtrial')}}">Next Page</a></li>
+<li class="nav-link"><a href="{{url_for('options')}}">Go To Options</a></li>
+{% endblock %}
+
+
+{% block title %} Flowchart {% endblock %}
+
+
+
+{% block body %}
+
+<h1 style="text-align:center"> Process Flowchart</h1>
+
+<div  style="text-align:center">
+
+    <img  src="../static/flowimage101.jpg" >
+    <br>
+    <br>
+        <img  src="../static/flowimage202.jpg">
+    <!-- <img src="{{ url_for('static',filename='flowimage1.jpg')}}" alt=""> -->
+
+
+</div>
+
+
+{% endblock %}

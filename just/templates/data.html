@@ -1,0 +1,474 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+{% block previous %}
+<li class="nav-link"><a href="{{url_for('storage')}}">Previous Page</a></li>
+{% endblock %}
+
+{% block next %}
+<li class="nav-link"><a href="{{url_for('Flowchart')}}">Next Page</a></li>
+<li class="nav-link"><a href="{{url_for('options')}}">Go To Options</a></li>
+{% endblock %}
+
+
+{% block title %} Home {% endblock %}
+
+
+
+{% block body %}
+
+<style xmlns="http://www.w3.org/1999/html">
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+label {
+  display: inline-block;
+  width: 130px;
+  font-weight:bold;
+}
+</style>
+
+
+
+<div class="jumbotron">
+
+    <h2>Processes <b>Details </b>  <button type="button"  class="btn btn-success float-right"
+                                           data-toggle="modal" data-target="#mymodal">Add New Process</button> </h2>
+
+
+    {% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+    {% for message in messages %}
+
+    <div class="alert alert-success alert-dismissable" role="alert">
+
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+
+            <span aria-hidden="true">x</span>
+
+        </button>
+
+
+        {{message}}
+
+
+    </div>
+
+
+    {% endfor %}
+
+    {% endif %}
+    {% endwith %}
+
+
+
+
+    <table class="table table-success table-striped">
+
+        <tr>
+
+
+            <th scope="col" >Category</th>
+            <th scope="col" >ProcessDescription</th>
+            <th scope="col">Sucessor</th>
+            <th scope="col">Flowtype</th>
+            <th scope="col">UOM</th>
+            <th scope="col">Productivity</th>
+            <th scope="col">Responsibility</th>
+            <th scope="col">Facilitator</th>
+            <th scope="col">SuggestedProductivity</th>
+            {% for i in range(years) %}
+            <th scope="col">Volume Y{{i+1}}</th>
+            {% endfor %}
+            {% for i in range(years) %}
+            <th scope="col">Head Count Y{{i+1}}</th>
+            {% endfor %}
+            <th>Action</th>
+
+        </tr>
+
+
+        {% for np in range(nps) %}
+        <tr>
+            <td>{{process[years*np]['Category']}}</td>
+            <td>{{process[years*np]['ProcessDescription']}}</td>
+            <td>{{process[years*np]['Successor']}}</td>
+            <td>{{process[years*np]['Flowtype']}}</td>
+            <td>{{process[years*np]['UOM']}}</td>
+            <td>{{process[years*np]['Productivity']}}</td>
+            <td>{{process[years*np]['Responsibility']}}</td>
+            <td>{{process[years*np]['Facilitator']}}</td>
+            <td>{{process[years*np]['SuggestedProductivity']}}</td>
+            {% for i in range(years) %}
+            <td>{{process[years*np+i]['Volume']}}</td>
+            {% endfor %}
+            {% for i in range(years) %}
+            <td>{{process[years*np+i]['headcount']}}</td>
+            {% endfor %}
+
+            <td>
+
+                           <span>
+                            <a class="btn btn-success" data-toggle="modal" data-target="#modaledit{{np}}" >Update</a>
+                            <a href="/delete/{{np}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Delete</a>
+                            </span>
+
+            </td>
+
+        </tr>
+
+
+        <!-- Modal Edit Employee-->
+        <div id="modaledit{{np}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+
+                <div class="modal-content">
+
+
+                    <div class="modal-header">
+
+
+                        <h4 class="modal-title">Update Information</h4>
+
+
+                    </div>
+
+
+                    <div class="modal-body">
+
+
+                        <form action="{{url_for('update')}}" method="POST">
+
+
+                            <div class="form-group">
+
+
+                                <label>Category:</label>
+                                <input type="hidden"  name="id" value="{{np}}">
+
+                                <input type="text" class="form-control" name="Category" value="{{process[years*np]['Category']}}">
+
+
+                            </div>
+
+
+
+                            <div class="form-group">
+
+
+                                <label>ProcessDescription:</label>
+
+                                <input type="text" class="form-control" name="ProcessDescription" value="{{process[years*np]['ProcessDescription']}}">
+
+
+                            </div>
+
+
+                            <div class="form-group">
+
+
+                                <label>Successor:</label>
+
+                                <input type="text" class="form-control" name="Sucessor" value="{{process[years*np]['Successor']}}">
+
+
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Flowtype:</label>
+                                <select name="Flowtype"  value="{{process[years*np]['Flowtype']}}">
+                                    <option value="Material Flow">Material Flow</option>
+                                    <option value="Process Flow">Process Flow</option>
+                                    <option value="Decision Point">Decision Point</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>UOM:</label>
+                                <select name="UOM"  value="{{process[years*np]['UOM']}}">
+                                    {% for x in uom_list %}
+                                    <option value={{x}}>{{x}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+
+
+
+                            <div class="form-group">
+
+
+                                <label>Productivity:</label>
+
+                                <input type="text" class="form-control" name="Productivity" value="{{process[years*np]['Productivity']}}">
+
+
+                            </div>
+
+
+
+                            <div class="form-group">
+
+
+                                <label>Responsibility:</label>
+
+                                <input type="text" class="form-control" name="Responsibility" value="{{process[years*np]['Responsibility']}}">
+
+
+                            </div>
+
+
+
+                            <div class="form-group">
+
+
+                                <label>Facilitator:</label>
+
+                                <input type="text" class="form-control" name="Facilitator" value="{{process[years*np]['Facilitator']}}">
+
+
+                            </div>
+
+                            <div class="form-group">
+
+
+                                <label>SuggestedProductivity:</label>
+
+                                <input type="text" class="form-control" name="SuggestedProductivity" value="{{process[years*np]['SuggestedProductivity']}}">
+
+
+                            </div>
+
+
+                            <div class="form-group">
+
+
+                                <button class="btn btn-primary" type="submit">Update</button>
+
+
+                            </div>
+
+
+                        </form>
+
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </table>
+    <a class="btn btn-primary btn-lg btn-block"  href="{{url_for('Flowchart')}}" >Create Flowchart</a>
+
+</div>
+
+
+
+<!-- Modal Add Employee-->
+
+
+<div id="mymodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title">Add New Process</h4>
+            </div>
+            <div class="modal-body">
+
+                <form action="{{url_for('insert')}}" method="POST">
+
+                    <div class="form-group">
+
+                        <label>Category:</label>
+                        <input type="text" class="form-control" name="Category" required="1">
+
+
+                    </div>
+
+
+                    <div class="form-group">
+
+
+                        <label>ProcessDescription:</label>
+                        <input type="text" class="form-control" name="ProcessDescription" required="1">
+
+
+                    </div>
+
+
+                    <div class="form-group">
+
+
+                        <label>Sucessor:</label>
+                        <input type="text" class="form-control" name="Sucessor" required="1">
+
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Flowtype:</label>
+                        <!-- <input type="text" class="form-control" name="Flowtype" required="1"> -->
+                        <select name="Flowtype" id="Flowtype">
+                            <!-- <option value="" selected disabled hidden>Choose here</option> -->
+                            <option value="Material Flow">Material Flow</option>
+                            <option value="Process Flow">Process Flow</option>
+                            <option value="Decision Point">Decision Point</option>
+                        </select>
+
+
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label>UOM:</label>
+                        <select name="UOM"  >
+                            {% for x in uom_list %}
+                            <option value={{x}}>{{x}}</option>
+                            {% endfor %}
+                        </select>
+
+
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+
+                        <label>Productivity:</label>
+                        <input type="number" step='any' class="form-control" name="Productivity" required="1">
+
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+                        <label>Responsibility:</label>
+                        <input type="text" class="form-control" name="Responsibility" required="1">
+
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+                        <label>Facilitator:</label>
+                        <input type="text" class="form-control" name="Facilitator" required="1">
+
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+                        <label>SuggestedProductive:</label>
+                        <input type="number" step='any' class="form-control" name="SuggestedProductivity" required="1">
+
+
+                    </div>
+
+                    <div class="form-group">
+
+
+                        <button class="btn btn-primary" type="submit">Add Process</button>
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+            <div class="modal-footer">
+
+
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+
+{% endblock %}

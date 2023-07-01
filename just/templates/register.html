@@ -1,0 +1,89 @@
+<!-- Add this inside the body section
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div id="flash-messages">
+      {% for message in messages %}
+        <div class="alert alert-{{ message[1] }}">
+          {{ message[0] }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+Add this script at the bottom of the page
+<script>
+  setTimeout(function() {
+    var flashMessages = document.getElementById('flash-messages');
+    if (flashMessages) {
+      flashMessages.style.display = 'none';
+    }
+  }, 3000);
+</script>
+
+Add this inside the body section
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div id="flash-messages">
+      {% for message in messages %}
+        <div class="alert alert-{{ message[1] }}">
+          {{ message[0] }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+Add this script at the bottom of the page
+<script>
+  setTimeout(function() {
+    var flashMessages = document.getElementById('flash-messages');
+    if (flashMessages) {
+      flashMessages.style.display = 'none';
+    }
+  }, 3000);
+</script> -->
+
+
+
+{% extends "base_login.html" %}
+{% block content %}
+<div class="jumbotron">
+  <form method="POST">
+      {# This hidden_tag is a CSRF security feature. #}
+      {{ form.hidden_tag() }}
+      <table class="table table-striped">
+
+        <tr>
+          <td>  {{ form.Name.label }} </td>
+          <td>{{ form.Name() }}</td>
+
+        </tr>
+        <tr>
+          <td>{{form.Mobile_Number.label}}</td>
+           <td>{{form.Mobile_Number()}}</td>
+        </tr>
+        <tr>
+          <td>{{ form.email.label }} </td>
+          <td>{{ form.email() }}</td>
+
+        </tr>
+        <tr>
+          <td>  {{ form.password.label }} </td>
+           <td>{{ form.password() }}</td>
+        </tr>
+        <tr>
+          <td>  {{ form.pass_confirm.label }}</td>
+          <td>{{ form.pass_confirm() }}</td>
+
+        </tr>
+      </table>
+
+
+
+
+      {{ form.submit() }}
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,541 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+{% block previous %}
+<li class="nav-link"><a href="{{url_for('operational_assumptions')}}">Previous Page</a></li>
+{% endblock %}
+
+{% block next %}
+<li class="nav-link"><a href="{{url_for('DataEntry')}}">Next Page</a></li>
+<li class="nav-link"><a href="{{url_for('options')}}">Go To Options</a></li>
+{% endblock %}
+
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+</style>
+
+<div class="row">
+<div class="column">
+<div class="jumbotron">
+    <h2>Storage Area <b>Calculations </b>  <button type="button"  class="btn btn-success float-right"
+            data-toggle="modal" data-target="#mymodal">Add New Storage Type</button>
+    </h2>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+
+    <div class="alert alert-success alert-dismissable" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">x</span>
+        </button>
+
+        {{message}}
+    </div>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+
+<div class="container">
+    <div class="row">
+        {% for nst in range(nsts) %}
+        <div class="col-sm">
+
+            <table class="table container table-success float-left float-up ">
+              <tr>
+                  <th bgcolor="#79e095">Description</th>
+                  {% for i in range(year) %}
+                  <th bgcolor="#79e095">value_year{{i+1}}</th>
+                  {% endfor %}
+              </tr>
+
+              {% for dlbl, lbl in des_list %}
+              <tr>
+                  <th>{{lbl}}</th>
+                  {% for i in range(year) %}
+                  <td>{{ storage_data[3*nst+i][dlbl] }} </td>
+                  {% endfor %}
+              </tr>
+              {% endfor %}
+
+              <tr>
+                  <td >
+                      <span><a class="btn btn-success" data-toggle="modal" data-target="#modaledit{{nst}}" >Update</a></span>
+                  </td>
+              </tr>
+            </table>
+
+            <!-- Modal Edit storage type-->
+            <div id="modaledit{{nst}}" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+
+                     <div class="modal-header">
+                        <h4 class="modal-title">Update Information for storage type {{nst + 1}} </h4>
+                     </div>
+
+                      <div class="modal-body">
+                          <form action="{{url_for('update_storage')}}" method="POST">
+                              <input type="hidden"  name="nst" value={{nst}}>
+
+                              <div class="form-group">
+                                  <table>
+                                      <tr>
+                                         <th>Description</th>
+                                          {% for i in range(year) %}
+                                         <th>Year{{i+1}}</th>
+                                         {% endfor %}
+                                      </tr>
+
+                                      {% for dlbl, label in inp_list %}
+
+                                      <tr>
+                                          <th>{{label}}</th>
+                                          {% for i in range(year) %}
+                                          {% if dlbl in ['Storage_type','MHE_type'] %}
+                                            <td><input type=text  name={{dlbl}}{{i+1}} value= {{storage_data[3*nst+i][dlbl]}} ></td>
+                                          {% else %}
+                                            <td><input type='number' step=any name={{dlbl}}{{i+1}} value= {{storage_data[3*nst+i][dlbl]}} ></td>
+                                          {% endif %}
+                                          {% endfor %}
+                                      </tr>
+
+                                      {% endfor %}
+
+                                  </table>
+
+                              </div>
+
+                              <div class="form-group">
+                                <button class="btn btn-primary" type="submit">Update</button>
+                              </div>
+
+                          </form>
+
+
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+
+                  </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</div>
+<div class="column">
+
+
+<div class="jumbotron">
+    {% if (bur==[] and nsts > 0) %}
+    <h2>Final area <b>calculation </b>  <button type="button"  class="btn btn-success float-right"
+                data-toggle="modal" data-target="#burinput">Add built up ratio</button> </h2>
+    {% else %}
+    <h2>Final area <b>calculation </b>   </h2>
+
+    {% endif %}
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+
+            <table class="table container table-success float-left float-up ">
+                <tr>
+                    <th bgcolor="#79e095">Description</th>
+                     {% for i in range(year) %}
+                    <th bgcolor="#79e095">Year{{i+1}}</th>
+                    {% endfor %}
+
+                </tr>
+                {% if nsts > 0 %}
+                <tr>
+                    <th>Carpet area (in sqft) </th>
+                    {% for i in range(year) %}
+                    <td> {{ carpet_area[i]  }} </td>
+                    {% endfor %}
+                </tr>
+
+                <!--
+                <tr>
+                    <th> Roundoff Carpet area</th>
+                    {% for i in range(year) %}
+                    {% if carpet_area == [] %}
+                    <td>0</td>
+                    {% else %}
+                    <td>{{ carpet_area[i]+100-carpet_area[i]%100 }}</td>
+                    {% endif %}
+                    {% endfor %}
+                </tr>
+                -->
+
+                {% else %}
+                {% endif %}
+
+                {% if bur %}
+
+                <tr>
+                    <th> Built up ratio (in %)</th>
+                    {% for i in range(year) %}
+                    <td>{{ bur[i].value}}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th> Rent/sqft (Builtup)</th>
+                    {% for i in range(year) %}
+                    <td>{{ Rent_per_sqft}}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th> Security Deposit (Months)</th>
+                    {% for i in range(year) %}
+                    <td>{{ Security_Deposit}}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th> Annual Interest rate on security deposit (%)</th>
+                    {% for i in range(year) %}
+                    <td>{{ Annual_rate_onsecuritydeposit}}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>Final Round Up Built up area (in sqft)</th>
+                    {% for i in range(year) %}
+                    <td> {{ carpet_area[i]*(1+bur[i].value/100) + 100-carpet_area[i]*(1+bur[i].value/100)%100 }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th>Monthly Rental</th>
+                    {% for i in range(year) %}
+                    <td> {{ monthly_rental[i] }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th>Monthly Interest on security deposit</th>
+                    {% for i in range(year) %}
+                    <td> {{ Monthly_Interest_onsecuritydeposit[i] }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th>Grand total Cost</th>
+                    {% for i in range(year) %}
+                    <td> {{ monthly_rental[i]+Monthly_Interest_onsecuritydeposit[i] }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <td><button type="button" data-toggle="modal" data-target="#updatebur">Update built up ratio</button></td>
+                </tr>
+                {%  endif %}
+
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+        <!-- Adding Misceleneous areas-->
+
+<div class="jumbotron">
+    {% if nsts > 0 %}
+    <h2>Miscellaneous areas <b>input </b>  <button type="button"  class="btn btn-success float-right"
+                data-toggle="modal" data-target="#otherareas">Add new misc area</button> </h2>
+    {% else %}
+    <h2>Miscellaneous areas <b>input </b>  </h2>
+    {% endif %}
+
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+
+            <table class="table container table-success float-left float-up ">
+                <tr>
+                    <th bgcolor="#79e095">Description</th>
+                    {% for i in range(year) %}
+                    <th bgcolor="#79e095">Year{{i+1}}</th>
+                    {% endfor %}
+
+
+                </tr>
+
+                {% for i in range(nma) %}
+
+                <tr>
+                    <td>{{ storage_data1[year*i].misc_areatype }} </td>
+                    {% for j in range(year) %}
+                    <td>{{ storage_data1[year*i+j].area  }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+            </table>
+
+        </div>
+    </div>
+</div>
+
+
+
+</div>
+</div>
+
+
+<!-- Modal Add storage type-->
+
+<div id="mymodal" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+
+         <div class="modal-header">
+            <h4 class="modal-title">Add New Storage Type</h4>
+         </div>
+
+         <div class="modal-body ">
+            <form action="{{url_for('storage')}}" method="POST">
+                 <div  class="form-group">
+
+                     <table >
+                         <tr>
+                             <th>Description</th>
+                    {% for i in range(year) %}
+                    <th >Year{{i+1}}</th>
+                    {% endfor %}
+                         </tr>
+
+                         {% for dlbl, label in inp_list %}
+
+                         <tr>
+                             <th>{{label}}</th>
+                             {% for i in range(year) %}
+                             {% if dlbl in ['Storage_type','MHE_type'] %}
+                             <td><input type=text  name={{dlbl}}{{i+1}} required="1" ></td>
+                             {% else %}
+                             <td><input type='number' step=any name={{dlbl}}{{i+1}} required="1" ></td>
+                             {% endif %}
+                             {% endfor %}
+                         </tr>
+
+                         {% endfor %}
+
+                     </table>
+               </div>
+
+               <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Add Storage Type</button>
+               </div>
+            </form>
+         </div>
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+
+<!--        <script>-->
+<!--function copyTextValue() {-->
+<!--   {% for i in range(year) %}-->
+
+<!--    var text{{i}} = document.getElementById("bur{{i}}").value;-->
+<!--    document.getElementById("bua{{i}}").value = (text{{ i }} + 1) * ({{ carpet_area[i] }}) ;-->
+<!--    var temp = 500 - document.getElementById("bua{{i}}").value%500-->
+<!--    document.getElementById("roa{{i}}").value= temp + document.getElementById("bua{{i}}").value;-->
+
+<!--    {% endfor %}-->
+<!--}-->
+<!--</script>-->
+
+<div id="otherareas" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+         <div class="modal-header">
+            <h4 class="modal-title">Add misc area</h4>
+         </div>
+
+         <div class="modal-body ">
+            <form action="{{url_for('miscareas')}}" method="POST">
+                 <div  class="form-group">
+                     <table >
+
+                         <tr>
+                             <th>Misc Area Type</th>
+                             {% for i in range(year) %}
+                    <th >Year{{i+1}}</th>
+                    {% endfor %}
+
+                         </tr>
+
+                         <tr>
+                             <td><input type=text  name=areatype required="1" ></td>
+                             {% for i in range(year) %}
+                             <td><input type='number' step=any name=value{{i+1}} required="1" ></td>
+                             {% endfor %}
+                         </tr>
+
+                     </table>
+               </div>
+
+               <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Add misc area</button>
+               </div>
+
+            </form>
+         </div>
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+
+      </div>
+    </div>
+</div>
+
+
+<div id="burinput" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+
+         <div class="modal-header">
+            <h4 class="modal-title">Add Built up ratio</h4>
+         </div>
+
+         <div class="modal-body ">
+            <form action="{{url_for('addbur')}}" method="POST">
+                 <div  class="form-group">
+                     <table >
+                         <tr>
+                             <th>       </th>
+                             {% for i in range(year) %}
+                    <th >Year{{i+1}}</th>
+                    {% endfor %}
+
+                         </tr>
+                         <tr>
+                             <th>Builtup Ratio (in %)</th>
+                             {% for i in range(year) %}
+                             <td><input type=number step="any" name=bur{{i}} required="1" ></td>
+                             {% endfor %}
+                         </tr>
+                     </table>
+                 </div>
+
+                 <div class="form-group">
+                     <button class="btn btn-primary" type="submit">Add Builtup Ratio</button>
+                 </div>
+
+            </form>
+         </div>
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+
+      </div>
+   </div>
+</div>
+
+<!--    popup for updating builtup ratio-->
+<div id="updatebur" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+
+         <div class="modal-header">
+            <h4 class="modal-title">Update Built up ratio</h4>
+         </div>
+
+         <div class="modal-body ">
+
+            <form action="{{url_for('updatebur')}}" method="POST">
+                 <div  class="form-group">
+                     <table >
+                         <tr>
+                             <th>       </th>
+                             {% for i in range(year) %}
+                          <th >Year{{i+1}}</th>
+                         {% endfor %}
+                         </tr>
+
+                         <tr>
+                             <th>Builtup Ratio (in %) </th>
+                             {% for i in range(year) %}
+                             <td><input type=number step=1 name=bur{{i}} required="1" ></td>
+                             {% endfor %}
+                         </tr>
+                     </table>
+               </div>
+
+               <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Update Builtup Ratio</button>
+               </div>
+            </form>
+         </div>
+
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+
+      </div>
+   </div>
+</div>
+
+{% endblock body %}

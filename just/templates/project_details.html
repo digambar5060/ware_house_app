@@ -1,0 +1,282 @@
+
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+{% block next %}
+<li class="nav-link"><a href="{{url_for('financialparameters')}}">Next Page</a></li>
+<li class="nav-link"><a href="{{url_for('options')}}">Go To Options</a></li>
+{% endblock %}
+{% block title %} Home {% endblock %}
+
+{% block body %}
+
+<style xmlns="http://www.w3.org/1999/html">
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+label {
+  display: inline-block;
+  width: 130px;
+  font-weight:bold;
+}
+</style>
+
+
+<div class="jumbotron">
+    <h2>Project <b>Detils </b>
+        {% if data == [] %}
+        <button type="button"  class="btn btn-success float-right"
+                data-toggle="modal" data-target="#mymodal">Add New Data</button>
+        {% endif %}
+    </h2>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+
+    <div class="alert alert-success alert-dismissable" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">x</span>
+        </button>
+
+        {{message}}
+    </div>
+
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <br>
+    <!--Display general assumptions table-->
+    <!--Display general assumption heading-->
+    <table>
+        <tr>
+            <th bgcolor="#79e095">Header</th>
+            <th bgcolor="#79e095">Details</th>
+        </tr>
+
+        <!--Display general assumption data-->
+
+        {% if data != [] %}
+        <tr>
+            <td>Date</td>
+            <td>{{data[0]['date']}}</td>
+        </tr>
+        <tr>
+            <td>Project Members</td>
+            <td>{{data[0]['project_member']}}</td>
+        </tr>
+        <tr>
+            <td>Due Date for RFQ submission</td>
+            <td>{{data[0]['due_date']}}</td>
+        </tr>
+        <tr>
+            <td>Primary Scope of Project</td>
+            <td>{{data[0]['scope']}}</td>
+        </tr>
+        <tr>
+            <td>Location and Name of proposed site</td>
+            <td>{{data[0]['location']}}</td>
+        </tr>
+        <tr>
+            <td>BD/Tender/Country Manager</td>
+            <td>{{data[0]['tender']}}</td>
+        </tr>
+        <tr>
+            <td>Opportunity- ID</td>
+            <td>{{data[0]['op_id']}}</td>
+        </tr>
+
+        <tr>
+
+            <td>
+                <span>
+                    <a class="btn btn-success" data-toggle="modal" data-target="#modaledit" >Update</a>
+                </span>
+            </td>
+        </tr>
+    </table>
+
+        <!--Edit PUC data-->
+        <div id="modaledit" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update Data</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form action="{{url_for('pd_update')}}" method="POST">
+                            <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td>Date:</td>
+                                        <td>
+                                            <input type=date name="date" value="{{data[0]['date']}}" required="1" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Project Members</td>
+                                        <td>
+                                            <input type=text name="project_member" value="{{data[0]['project_member']}}" required="1" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Due Date for RFQ submission</td>
+                                        <td>
+                                            <input type=date name="due_date" value="{{data[0]['due_date']}}" required="1" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Primary Scope of Project</td>
+                                        <td>
+                                            <input type=text name="scope" value="{{data[0]['scope']}}" required="1" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Location and Name of proposed site</td>
+                                        <td>
+                                            <input type=text name="location" value="{{data[0]['location']}}" required="1" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>BD/Tender/Country Manager</td>
+                                        <td>
+                                            <input type=text name="tender" value="{{data[0]['tender']}}" required="1" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Opportunity- ID</td>
+                                        <td>
+                                            <input type=text name="op_id" value="{{data[0]['op_id']}}" required="1" >
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endif %}
+</div>
+</table>
+<!-- Modal Add new Assumption -->
+{% if data == [] %}
+<div id="mymodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Add Project Details</h4>
+            </div>
+
+            <div class="modal-body ">
+                <form action="{{url_for('pd_add')}}" method="POST">
+                    <div class="form-group">
+                        <table >
+                            <tr>
+                                <td>Date:</td>
+                                <td>
+                                    <input type=date name="date"  required="1" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Project Members</td>
+                                <td>
+                                    <input type=text name="project_member"  required="1" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Due Date for RFQ submission</td>
+                                <td>
+                                    <input type=date name="due_date"  required="1" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Primary Scope of Project</td>
+                                <td>
+                                    <input type=text name="scope"  required="1" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location and Name of proposed site</td>
+                                <td>
+                                    <input type=text name="location"  required="1" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BD/Tender/Country Manager</td>
+                                <td>
+                                    <input type=text name="tender"  required="1" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Opportunity- ID</td>
+                                <td>
+                                    <input type=text name="op_id"  required="1" >
+                                </td>
+                            </tr>
+
+
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

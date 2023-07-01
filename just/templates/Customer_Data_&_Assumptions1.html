@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+
+{% block previous %}
+<li class="nav-link"><a href="{{url_for('financialparameters')}}">Previous Page</a></li>
+{% endblock %}
+
+{% block next %}
+<li class="nav-link"><a href="{{url_for('general_assumptions')}}">Next Page</a></li>
+<li class="nav-link"><a href="{{url_for('options')}}">Go To Options</a></li>
+{% endblock %}
+
+
+{% block title %}Customer Data And Assumption {% endblock %}
+
+
+
+{% block body %}
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+</style>
+    <div class="row">
+        <div class="column">
+            <div class="jumbotron">
+                <h2>Customer Data & Assumptions  <button type="button"  class="btn btn-success float-right"
+                data-toggle="modal" data-target="#mymodal">Add New Row</button> </h2>
+
+                {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+
+                {% for message in messages %}
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+
+                    {{message}}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <table class="table container table-success float-left float-up ">
+                                <tr>
+                                    <th bgcolor="#79e095">Description</th>
+                                    <th bgcolor="#79e095">UOM</th>
+                                    {% for i in range(years) %}
+                                    <th bgcolor="#79e095">Monthly Value {{i+1}}</th>
+                                    {% endfor %}
+                                    <th bgcolor="#79e095">Action</th>
+                                </tr>
+                                {% for ncd in range(ncds) %}
+                                <tr>
+                                    <td>{{data[years*ncd]['Description']}}</td>
+                                    <td>{{data[years*ncd]['UOM']}}</td>
+
+                                    {% for i in range(years) %}
+                                    <td>{{ data[years*ncd+i]['Monthly_Value'] }} </td>
+                                    {% endfor %}
+                                    <td >
+                                        <span><a class="btn btn-success" data-toggle="modal" data-target="#modaledit{{ncd}}" >Update</a></span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+
+                            <!-- Modal Edit storage type-->
+                            {% for ncd in range(ncds) %}
+                            <div id="modaledit{{ncd}}" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">Update Customer Data And Assumptions </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{url_for('CustomerUpdate')}}" method="POST">
+                                                <input type="hidden"  name="ncd" value={{ncd}}>
+                                                <div class="form-group">
+                                                    <table>
+
+                                                        <tr>
+                                                            <th>Description</th>
+                                                            <th>UOM</th>
+                                                            {% for i in range(years) %}
+                                                            <th>Year{{i+1}}</th>
+                                                            {% endfor %}
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><input type=text  name=Description value= {{data[years*ncd]['Description']}} ></td>
+                                                            <td><input type=text  name=UOM value= {{data[years*ncd]['UOM']}} ></td>
+                                                            {% for i in range(years) %}
+                                                            <td><input type='number' step=any name=Monthly_Value{{i}} value= {{data[years*ncd+i]['Monthly_Value']}} ></td>
+                                                            {% endfor %}
+                                                        </tr>
+
+
+                                                    </table>
+
+
+                                                    <div>
+                                                        <button class="btn btn-primary" type="submit">Update</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Add Customer data -->
+
+<div id="mymodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Customer Data</h4>
+            </div>
+
+            <div class="modal-body ">
+                <form action="{{url_for('CustomerAdd')}}" method="POST">
+                    <div  class="form-group">
+                        <table>
+                            <tr>
+                                <th>Description</th>
+                                <th>UOM</th>
+                                {% for i in range(years) %}
+                                <th>Year{{i+1}}</th>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td><input type=text  name=Description  ></td>
+                                <td><input type=text  name=UOM  ></td>
+                                {% for i in range(years) %}
+                                <td><input type='number' step=any name=Monthly_Value{{i}}  ></td>
+                                {% endfor %}
+                            </tr>
+
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Add Row</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
